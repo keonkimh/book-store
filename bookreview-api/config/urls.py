@@ -24,14 +24,11 @@ from rest_framework_simplejwt.views import (
 from users.views import RegisterView
 from books.views import BookViewSet
 
-router = DefaultRouter()
-router.register(r'', BookViewSet, basename='book')
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/register/', RegisterView.as_view(), name='register'),
     path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/books/', include(router.urls)),
+    path('api/books/', include('books.urls')),
 ]
