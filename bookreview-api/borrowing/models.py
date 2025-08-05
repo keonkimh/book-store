@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from books.models.book_models import BookInstance
+from books.models.book_instance_models import BookInstance
 
 # Create your models here.
 class Borrow(models.Model):

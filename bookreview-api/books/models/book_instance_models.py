@@ -1,4 +1,5 @@
 from django.db import models
+from books.models.book_models import Book
 
 class BookInstance(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='instances')
