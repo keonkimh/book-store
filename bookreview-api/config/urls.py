@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
 )
 from users.views import RegisterView
 from books.views import BookViewSet
+from borrowing.views import BorrowViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +32,5 @@ urlpatterns = [
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/books/', include('books.urls')),
+    path('api/borrow/', include('borrowing.urls')),
 ]
