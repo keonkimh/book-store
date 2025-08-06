@@ -1,8 +1,8 @@
-from django.urls import path
-from .views import BorrowViewSet
 from rest_framework.routers import SimpleRouter
 
+from .views import BorrowViewSet
+
 router = SimpleRouter()
-router.register(r'', BorrowViewSet, basename='borrow')
+router.register(r"", BorrowViewSet, basename="borrow")
 
 urlpatterns = router.urls

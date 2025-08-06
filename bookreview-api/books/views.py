@@ -1,8 +1,8 @@
-from django.shortcuts import render
 from rest_framework import viewsets
-from .serializers import BookSerializer
+
 from .models.book_models import Book
-from rest_framework.permissions import AllowAny
+from .serializers import BookSerializer
+
 
 # Create your views here.
 class BookViewSet(viewsets.ModelViewSet):

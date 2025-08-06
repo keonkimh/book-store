@@ -1,8 +1,10 @@
-from rest_framework import serializers
+from borrowing.models import Borrow
 from django.conf import settings
 from django.utils import timezone
+from rest_framework import serializers
+
 from .models.book_models import Book
-from borrowing.models import Borrow
+
 
 class BookSerializer(serializers.ModelSerializer):
     available_count = serializers.SerializerMethodField()
@@ -10,7 +12,16 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ('id', 'title', 'author', 'description', 'genre', 'date_published', 'available_count', 'earliest_available_date')
+        fields = (
+            "id",
+            "title",
+            "author",
+            "description",
+            "genre",
+            "date_published",
+            "available_count",
+            "earliest_available_date",
+        )
 
     def create(self, validated_data):
         book = Book.objects.create(**validated_data)
@@ -24,11 +35,16 @@ class BookSerializer(serializers.ModelSerializer):
             return None
 
         earliest_borrow = (
-            Borrow.objects.filter(book_instance__book=obj, book_instance__is_available=False).order_by("date_borrowed")
+            Borrow.objects.filter(
+                book_instance__book=obj, book_instance__is_available=False
+            )
+            .order_by("date_borrowed")
             .first()
         )
 
         if earliest_borrow:
-            return earliest_borrow.date_borrowed + timezone.timedelta(days=settings.MAX_BORROW_DAYS)
-            
+            return earliest_borrow.date_borrowed + timezone.timedelta(
+                days=settings.MAX_BORROW_DAYS
+            )
+
         return None
