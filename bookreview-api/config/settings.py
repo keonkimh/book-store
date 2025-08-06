@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'users',
+    'core',
     'books',
     'borrowing',
 ]
@@ -136,3 +137,5 @@ REST_FRAMEWORK = {
     ]
 }
 AUTH_USER_MODEL = 'users.User'
+
+MAX_BORROW_DAYS = 7  # Default borrowing period in days

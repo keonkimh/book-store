@@ -13,3 +13,11 @@ class Borrow(models.Model):
 
     def __str__(self):
         return f"{self.user.username} borrowed {self.book_instance.book.title} on {self.date_borrowed.strftime('%Y-%m-%d')}"
+
+    def save(self, *args, **kwargs):
+        available_instances = BookInstance.objects.filter(book=self.book_instance.book, is_available=True).count()
+        if available_instances < 1:
+            raise ValueError("No available copies of this book to borrow.")
+        self.book_instance.is_available = False
+        self.book_instance.save()
+        super().save(*args, **kwargs)
