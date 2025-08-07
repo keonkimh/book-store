@@ -2,11 +2,22 @@ from borrowing.models import Borrow
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
+from books.models.book_genre_models import BookGenre
 
 from .models.book_models import Book
 
+class BookGenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookGenre
+        fields = ('id', 'name', 'created_at', 'updated_at')
+
 
 class BookSerializer(serializers.ModelSerializer):
+    genre = BookGenreSerializer(read_only=True)
+    genre_id = serializers.PrimaryKeyRelatedField(
+        queryset=BookGenre.objects.all(), source="genre", write_only=True
+    )
+    number_of_copies = serializers.IntegerField(write_only=True)
     available_count = serializers.SerializerMethodField()
     earliest_available_date = serializers.SerializerMethodField()
 
@@ -18,7 +29,9 @@ class BookSerializer(serializers.ModelSerializer):
             "author",
             "description",
             "genre",
+            "genre_id",
             "date_published",
+            "number_of_copies",
             "available_count",
             "earliest_available_date",
         )
@@ -42,9 +55,6 @@ class BookSerializer(serializers.ModelSerializer):
             .first()
         )
 
-        if earliest_borrow:
-            return earliest_borrow.date_borrowed + timezone.timedelta(
-                days=settings.MAX_BORROW_DAYS
-            )
-
-        return None
+        return earliest_borrow.date_borrowed + timezone.timedelta(
+            days=settings.MAX_BORROW_DAYS
+        )
