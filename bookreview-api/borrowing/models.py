@@ -1,7 +1,7 @@
 from books.models.book_instance_models import BookInstance
 from django.conf import settings
 from django.db import models
-
+from django.utils import timezone
 
 # Create your models here.
 class Borrow(models.Model):
@@ -20,11 +20,18 @@ class Borrow(models.Model):
         return f"{self.user.username} borrowed {self.book_instance.book.title} on {self.date_borrowed.strftime('%Y-%m-%d')}"
 
     def save(self, *args, **kwargs):
-        available_instances = BookInstance.objects.filter(
-            book=self.book_instance.book, is_available=True
-        ).count()
-        if available_instances < 1:
-            raise ValueError("No available copies of this book to borrow.")
+        if not self.book_instance.is_available:
+            raise ValueError("This book is already borrowed.")
+
         self.book_instance.is_available = False
         self.book_instance.save()
         super().save(*args, **kwargs)
+
+    def mark_as_returned(self):
+        if self.book_instance.is_available:
+            raise ValueError("This book is already returned.")
+        self.book_instance.is_available = True
+        self.book_instance.save(update_fields=["is_available"])
+        self.is_returned = True
+        self.date_returned = timezone.now()
+        super(Borrow, self).save(update_fields=["is_returned", "date_returned"])
