@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
 from books.models.book_genre_models import BookGenre
-
+from django.db import transaction
 from .models.book_models import Book
 
 class BookGenreSerializer(serializers.ModelSerializer):
@@ -37,7 +37,12 @@ class BookSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        book = Book.objects.create(**validated_data)
+        number_of_copies = validated_data.pop("number_of_copies", 0)
+        with transaction.atomic():
+            book = Book.objects.create(**validated_data)
+            from books.models.book_instance_models import BookInstance
+            for _ in range(number_of_copies):
+                BookInstance.objects.create(book=book)
         return book
 
     def get_available_count(self, obj):
