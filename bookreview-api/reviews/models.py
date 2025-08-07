@@ -1,11 +1,12 @@
 from django.db import models
 from core.models.base import BaseModel
 from django.conf import settings
+from books.models.book_models import Book
 
 # Create your models here.
 class Review(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews')
-    book = models.ForeignKey('books.Book', on_delete=models.CASCADE, related_name='reviews')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveIntegerField()
     comment = models.TextField(blank=True, null=True)
     date_reviewed = models.DateTimeField(auto_now_add=True)
