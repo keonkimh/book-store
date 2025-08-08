@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "books",
     "borrowing",
     "reviews",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -140,3 +143,7 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"
 
 MAX_BORROW_DAYS = 7  # Default borrowing period in days
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Adjust this to your frontend URL
+]
