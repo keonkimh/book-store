@@ -2,20 +2,22 @@ from rest_framework import serializers
 from django.db import transaction
 from .models import Review
 from books.models.book_models import Book
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'user', 'book', 'rating', 'comment', 'date_reviewed']
-        read_only_fields = ['id', 'date_reviewed']
+        read_only_fields = ['id', 'date_reviewed', 'user']
         validators = []
 
     def create(self, validated_data):
+        request = self.context.get('request')
         with transaction.atomic():
             # Ensure the book exists
             book = validated_data.get('book')
-            user = validated_data.get('user')
+            validated_data["user"] = request.user
+            user = validated_data["user"]
             if not book:
                 raise serializers.ValidationError("Book must be provided.")
 

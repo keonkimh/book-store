@@ -6,6 +6,12 @@ from books.models.book_genre_models import BookGenre
 from django.db import transaction
 from .models.book_models import Book
 from reviews.serializers import ReviewSerializer
+from books.models.book_instance_models import BookInstance
+
+class BookInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookInstance
+        fields = ("id", "is_available", "date_added")
 
 class BookGenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +28,7 @@ class BookSerializer(serializers.ModelSerializer):
     available_count = serializers.SerializerMethodField()
     earliest_available_date = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)
+    instances = BookInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Book
@@ -37,6 +44,7 @@ class BookSerializer(serializers.ModelSerializer):
             "available_count",
             "earliest_available_date",
             "reviews",
+            "instances",
         )
 
     def create(self, validated_data):
