@@ -45,6 +45,7 @@ class BookSerializer(serializers.ModelSerializer):
             "earliest_available_date",
             "reviews",
             "instances",
+            "cover_url",
         )
 
     def create(self, validated_data):
