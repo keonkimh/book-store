@@ -143,6 +143,8 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"
 
 MAX_BORROW_DAYS = 7  # Default borrowing period in days
+FEE_PER_DAY = 50 # this is in THB
+LOST_BORROW_DAYS = 90 # 3 months roughly
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Adjust this to your frontend URL

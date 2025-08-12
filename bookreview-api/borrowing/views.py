@@ -21,7 +21,11 @@ class BorrowViewSet(viewsets.ModelViewSet):
         except ValueError as e:
             return Response({"detail": str(e)}, status=400)
 
-        return Response({"detail": "Book returned successfully."}, status=200)
+        return Response({"detail": "Book returned successfully.",
+                        "fees_amount": borrow.fees_amount,
+                        "fees_paid": borrow.fees_paid,
+                        "paid_at": borrow.paid_at,
+        }, status=200)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

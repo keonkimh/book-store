@@ -11,7 +11,7 @@ from books.models.book_instance_models import BookInstance
 class BookInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookInstance
-        fields = ("id", "is_available", "date_added")
+        fields = ("id", "is_available", "date_added", "date_borrowed", "date_returned")
 
 class BookGenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,6 +29,7 @@ class BookSerializer(serializers.ModelSerializer):
     earliest_available_date = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)
     instances = BookInstanceSerializer(many=True, read_only=True)
+    average_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -46,6 +47,7 @@ class BookSerializer(serializers.ModelSerializer):
             "reviews",
             "instances",
             "cover_url",
+            "average_rating",
         )
 
     def create(self, validated_data):
@@ -75,3 +77,10 @@ class BookSerializer(serializers.ModelSerializer):
         return earliest_borrow.date_borrowed + timezone.timedelta(
             days=settings.MAX_BORROW_DAYS
         )
+
+    def get_average_rating(self, obj):
+        reviews = obj.reviews.all()
+        if not reviews:
+            return None
+        total_rating = sum(review.rating for review in reviews)
+        return total_rating / len(reviews) if len(reviews) > 0 else None
