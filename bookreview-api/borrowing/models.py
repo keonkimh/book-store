@@ -46,6 +46,17 @@ class Borrow(models.Model):
             self.fees_amount = 0
         return self.fees_amount
 
+    def make_payment(self):
+        if self.fees_paid is True:
+            raise ValueError("You paid already, return the book now.")
+        else:
+            self.fees_paid = True
+            self.paid_at = timezone.now()
+            self.save()
+            raise ValueError({
+                "message": f"Your fee is: {self.fees_amount}. Make a payment via PromptPay to 123-456-7890"
+            })
+
     def lost_date(self):
         return self.book_instance.date_borrowed + timezone.timedelta(days=LOST_BORROW_DAYS)
 
@@ -68,11 +79,7 @@ class Borrow(models.Model):
         self.book_instance.date_returned = timezone.now()
         fees = self.compute_fees()
         self.fees_amount = fees
-        if self.fees_amount > 0:
-            # raise Value("Fees must be paid before returning the book.")
-            self.fees_paid = True
-            self.paid_at = timezone.now()
-        else:
-            self.fees_paid = True
+        if self.fees_paid is False:
+            self.make_payment()
         self.book_instance.save()
         self.delete()
