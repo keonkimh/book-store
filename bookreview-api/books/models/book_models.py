@@ -10,7 +10,7 @@ class Book(BaseModel):
     genre = models.ForeignKey(BookGenre, on_delete=models.CASCADE, related_name="books")
     date_published = models.DateField()
     number_of_copies = models.PositiveIntegerField(default=0)
-    cover_url = models.URLField(max_length=500, blank=True, null=True)
+    cover_img = models.ImageField(default='default_cover.jpg')
 
     def __str__(self):
         return self.title

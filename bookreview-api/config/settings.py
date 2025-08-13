@@ -130,6 +130,9 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media/"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -143,8 +146,8 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = "users.User"
 
 MAX_BORROW_DAYS = 7  # Default borrowing period in days
-FEE_PER_DAY = 50 # this is in THB
-LOST_BORROW_DAYS = 90 # 3 months roughly
+FEE_PER_DAY = 50  # this is in THB
+LOST_BORROW_DAYS = 90  # 3 months roughly
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Adjust this to your frontend URL

@@ -7,6 +7,7 @@ from django.db import transaction
 from .models.book_models import Book
 from reviews.serializers import ReviewSerializer
 from books.models.book_instance_models import BookInstance
+from django.db.models.query import QuerySet
 
 class BookInstanceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +31,7 @@ class BookSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
     instances = BookInstanceSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
+    cover_img = serializers.ImageField()
 
     class Meta:
         model = Book
@@ -46,8 +48,8 @@ class BookSerializer(serializers.ModelSerializer):
             "earliest_available_date",
             "reviews",
             "instances",
-            "cover_url",
             "average_rating",
+            "cover_img",
         )
 
     def create(self, validated_data):
@@ -81,9 +83,10 @@ class BookSerializer(serializers.ModelSerializer):
             days=settings.MAX_BORROW_DAYS
         )
 
-    def get_average_rating(self, obj):
+    def get_average_rating(self, obj: QuerySet):
+
         reviews = obj.reviews.all()
         if not reviews:
             return None
         total_rating = sum(review.rating for review in reviews)
-        return total_rating / len(reviews) if len(reviews) > 0 else None
+        return total_rating / len(reviews)
