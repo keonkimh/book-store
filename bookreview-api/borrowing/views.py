@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from .models import Borrow
 from .serializers import BorrowSerializer
 from rest_framework.permissions import IsAuthenticated
-
+from django.utils import timezone
+from datetime import timedelta
+from config.settings import MAX_BORROW_DAYS, FEE_PER_DAY, LOST_BORROW_DAYS
 
 # Create your views here.
 class BorrowViewSet(viewsets.ModelViewSet):

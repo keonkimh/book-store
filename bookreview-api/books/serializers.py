@@ -11,7 +11,7 @@ from books.models.book_instance_models import BookInstance
 class BookInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookInstance
-        fields = ("id", "is_available", "date_added", "date_borrowed", "date_returned")
+        fields = ("id", "is_available", "date_added", "date_borrowed", "date_returned", "is_lost")
 
 class BookGenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,6 +73,9 @@ class BookSerializer(serializers.ModelSerializer):
             .order_by("date_borrowed")
             .first()
         )
+
+        if earliest_borrow is None:
+            return None
 
         return earliest_borrow.date_borrowed + timezone.timedelta(
             days=settings.MAX_BORROW_DAYS

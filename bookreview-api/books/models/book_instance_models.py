@@ -9,6 +9,7 @@ class BookInstance(BaseModel):
     date_added = models.DateTimeField(auto_now_add=True)
     date_borrowed = models.DateTimeField(null=True, blank=True)
     date_returned = models.DateTimeField(null=True, blank=True)
+    is_lost = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.book.title} ({'Available' if self.is_available else 'Not Available'})"

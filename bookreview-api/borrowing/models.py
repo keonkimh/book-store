@@ -2,7 +2,8 @@ from books.models.book_instance_models import BookInstance
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from config.settings import MAX_BORROW_DAYS, FEE_PER_DAY
+from config.settings import MAX_BORROW_DAYS, FEE_PER_DAY, LOST_BORROW_DAYS
+from datetime import timedelta
 
 # Create your models here.
 class Borrow(models.Model):
@@ -12,7 +13,7 @@ class Borrow(models.Model):
     book_instance = models.ForeignKey(
         BookInstance, on_delete=models.CASCADE, related_name="borrows"
     )
-    date_borrowed = models.DateTimeField(auto_now_add=True)
+    date_borrowed = models.DateTimeField(null=True, blank=True)
     date_returned = models.DateTimeField(null=True, blank=True)
 
     # fees system
@@ -29,7 +30,8 @@ class Borrow(models.Model):
 
         self.book_instance.is_available = False
         self.book_instance.date_returned = None
-        self.book_instance.date_borrowed = timezone.now()
+        self.book_instance.date_borrowed = timezone.now() - timedelta(days=91)
+        self.date_borrowed = timezone.now() - timedelta(days=91)
         self.book_instance.save()
         super().save(*args, **kwargs)
 
@@ -44,20 +46,33 @@ class Borrow(models.Model):
             self.fees_amount = 0
         return self.fees_amount
 
+    def lost_date(self):
+        return self.book_instance.date_borrowed + timezone.timedelta(days=LOST_BORROW_DAYS)
+
+    def mark_as_lost(self):
+        if not self.book_instance.is_available and not self.book_instance.is_lost:
+            if timezone.now() > self.lost_date():
+                self.book_instance.is_lost = True
+                self.book_instance.save()
+                print(self.book_instance.book.title)
+
+    def delete_lost_book(self):
+        if self.book_instance.is_lost:
+            self.book_instance.delete()
+
 
     def mark_as_returned(self):
         if self.book_instance.is_available:
             raise ValueError("This book is already returned.")
         self.book_instance.is_available = True
         self.book_instance.date_returned = timezone.now()
-        self.book_instance.date_borrowed = None
         fees = self.compute_fees()
         self.fees_amount = fees
         if self.fees_amount > 0:
-            raise("Fees must be paid before returning the book.")
+            # raise Value("Fees must be paid before returning the book.")
             self.fees_paid = True
             self.paid_at = timezone.now()
         else:
             self.fees_paid = True
         self.book_instance.save()
-        super().save()
+        self.delete()
