@@ -43,13 +43,12 @@ class Borrow(models.Model):
             overdue_days = (timezone.now() - self.due_date()).days
             self.fees_amount = overdue_days * FEE_PER_DAY
         else:
+            self.fees_paid = True
             self.fees_amount = 0
         return self.fees_amount
 
     def make_payment(self):
-        if self.fees_paid is True:
-            raise ValueError("You paid already, return the book now.")
-        else:
+        if self.fees_paid is False:
             self.fees_paid = True
             self.paid_at = timezone.now()
             self.save()
@@ -64,13 +63,12 @@ class Borrow(models.Model):
         if not self.book_instance.is_available and not self.book_instance.is_lost:
             if timezone.now() > self.lost_date():
                 self.book_instance.is_lost = True
+                self.book_instance.is_available = False
                 self.book_instance.save()
                 print(self.book_instance.book.title)
-
-    def delete_lost_book(self):
-        if self.book_instance.is_lost:
-            self.book_instance.delete()
-
+                print("Buying the replacement book.")
+                from books.models.book_instance_models import BookInstance
+                BookInstance.objects.create(book=self.book_instance.book, is_available=True)
 
     def mark_as_returned(self):
         if self.book_instance.is_available:

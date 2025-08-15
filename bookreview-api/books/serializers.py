@@ -27,6 +27,7 @@ class BookSerializer(serializers.ModelSerializer):
     )
     number_of_copies = serializers.IntegerField(write_only=True)
     available_count = serializers.SerializerMethodField()
+    books_not_lost = serializers.SerializerMethodField()
     earliest_available_date = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)
     instances = BookInstanceSerializer(many=True, read_only=True)
@@ -45,6 +46,7 @@ class BookSerializer(serializers.ModelSerializer):
             "date_published",
             "number_of_copies",
             "available_count",
+            "books_not_lost",
             "earliest_available_date",
             "reviews",
             "instances",
@@ -63,6 +65,9 @@ class BookSerializer(serializers.ModelSerializer):
 
     def get_available_count(self, obj):
         return obj.instances.filter(is_available=True).count()
+
+    def get_books_not_lost(self, obj):
+        return obj.instances.filter(is_lost=False).count()
 
     def get_earliest_available_date(self, obj):
         if obj.instances.filter(is_available=True).exists():

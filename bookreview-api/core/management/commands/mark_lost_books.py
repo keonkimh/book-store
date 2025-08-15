@@ -10,6 +10,7 @@ class Command(BaseCommand):
         overdue_borrows = Borrow.objects.filter(
             book_instance__is_available = False
         )
+        print(overdue_borrows)
         for borrow in overdue_borrows:
             borrow.mark_as_lost()
         self.stdout.write(self.style.SUCCESS("Marked overdue books as lost"))
