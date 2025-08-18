@@ -1,5 +1,5 @@
 import random
-
+from datetime import timedelta
 from books.models.book_instance_models import BookInstance
 from books.models.book_models import Book
 from books.models.book_genre_models import BookGenre
@@ -7,6 +7,7 @@ from borrowing.models import Borrow
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from faker import Faker
+from django.utils.timezone import now
 
 fake = Faker()
 User = get_user_model()
@@ -59,6 +60,6 @@ class Command(BaseCommand):
                 break
             book_instance = random.choice(list(available_instances))
             user = random.choice(users)
-            Borrow.objects.create(user=user, book_instance=book_instance)
+            Borrow.objects.create(user=user, book_instance=book_instance, date_borrowed=now() - timedelta(days=8))
 
         self.stdout.write(self.style.SUCCESS("Database seeded successfully."))

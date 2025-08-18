@@ -4,9 +4,7 @@ from rest_framework.response import Response
 from .models import Borrow
 from .serializers import BorrowSerializer
 from rest_framework.permissions import IsAuthenticated
-from django.utils import timezone
-from datetime import timedelta
-from config.settings import MAX_BORROW_DAYS, FEE_PER_DAY, LOST_BORROW_DAYS
+
 
 # Create your views here.
 class BorrowViewSet(viewsets.ModelViewSet):
@@ -15,7 +13,7 @@ class BorrowViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=["post"])
-    def return_book(self, request, pk=None):
+    def return_book(self, request, pk=None) -> Response:
         borrow = self.get_object()
 
         try:
@@ -27,7 +25,7 @@ class BorrowViewSet(viewsets.ModelViewSet):
                         "fees_amount": borrow.fees_amount,
                         "fees_paid": borrow.fees_paid,
                         "paid_at": borrow.paid_at,
-        }, status=200)
+                        }, status=200)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
