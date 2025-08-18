@@ -39,3 +39,4 @@ class ReviewTests(TestCase):
         other_user = User.objects.create(username="otheruser", email="example@gmail.com")
         with self.assertRaises(Exception):
             Review.objects.create(user=other_user, book=self.book, rating=4, comment="Nice book!")
+        self.assertEqual(Review.objects.count(), 0)
