@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "borrowing",
     "reviews",
     "corsheaders",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
